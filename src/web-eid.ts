@@ -33,18 +33,26 @@ import ResponseStatusSuccess from "./models/ResponseStatusSuccess";
 
 import WebExtensionService from "./services/WebExtensionService";
 
-import * as version from "./utils/version";
-import VersionMismatchError from "./errors/VersionMismatchError";
 import HttpResponse from "./models/HttpResponse";
-import MissingParameterError from "./errors/MissingParameterError";
-import defer from "./utils/defer";
 import ResponseSignSuccess from "./models/ResponseSignSuccess";
-
+import VersionMismatchError from "./errors/VersionMismatchError";
+import MissingParameterError from "./errors/MissingParameterError";
+import * as version from "./utils/version";
+import sleep from "./utils/sleep";
 
 const webExtensionService = new WebExtensionService();
+const initializationTime  = +new Date();
+
+/**
+ * Give browsers a moment to load the content script
+ */
+async function extensionLoadDelay(): Promise<void> {
+  const now = +new Date();
+  await sleep(initializationTime + config.MAX_EXTENSION_LOAD_DELAY - now);
+}
 
 export async function status(): Promise<Versions> {
-  await defer(); // Give chrome a moment to load the extension content script
+  await extensionLoadDelay();
 
   let statusResponse;
 
@@ -79,7 +87,7 @@ export async function status(): Promise<Versions> {
 }
 
 export async function authenticate(options: AuthenticateOptions): Promise<HttpResponse> {
-  await defer(); // Give chrome a moment to load the extension content script
+  await extensionLoadDelay();
 
   if (typeof options != "object") {
     throw new MissingParameterError("authenticate function requires an options object as parameter");
@@ -113,7 +121,7 @@ export async function authenticate(options: AuthenticateOptions): Promise<HttpRe
 }
 
 export async function sign(options: SignOptions): Promise<HttpResponse> {
-  await defer(); // Give chrome a moment to load the extension content script
+  await extensionLoadDelay();
 
   if (typeof options != "object") {
     throw new MissingParameterError("sign function requires an options object as parameter");

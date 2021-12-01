@@ -115,10 +115,6 @@ See below for `options` description.
 
 ## Table of contents
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
 - [Quickstart](#quickstart)
 - [Install](#install)
   - [Without a module system](#without-a-module-system)
@@ -129,24 +125,28 @@ See below for `options` description.
   - [Status](#status)
     - [Status parameters](#status-parameters)
     - [Status returns](#status-returns)
-    - [Status example - check using async-await](#status-example-check-using-async-await)
-    - [Status example - check using promises](#status-example-check-using-promises)
-    - [Status example - success](#status-example-success)
-    - [Status example - failure](#status-example-failure)
+    - [Status example: using async-await](#status-example-using-async-await)
+    - [Status example: using promises](#status-example-using-promises)
+    - [Status example: success](#status-example-success)
+    - [Status example: failure](#status-example-failure)
   - [Authenticate](#authenticate)
     - [Authenticate parameters](#authenticate-parameters)
     - [Authenticate returns](#authenticate-returns)
-    - [Authenticate example - using async-await](#authenticate-example-using-async-await)
-    - [Authenticate example - using promises](#authenticate-example-using-promises)
-    - [Authenticate example - success](#authenticate-example-success)
-    - [Authenticate example - failure](#authenticate-example-failure)
+    - [Authenticate example: using async-await](#authenticate-example-using-async-await)
+    - [Authenticate example: using promises](#authenticate-example-using-promises)
+    - [Authenticate example: success](#authenticate-example-success)
+    - [Authenticate example: failure](#authenticate-example-failure)
   - [Sign](#sign)
     - [Sign parameters](#sign-parameters)
     - [Sign returns](#sign-returns)
-    - [Sign example - using async-await](#sign-example-using-async-await)
-    - [Sign example - using promises](#sign-example-using-promises)
-    - [Sign example - success](#sign-example-success)
-    - [Sign example - failure](#sign-example-failure)
+    - [Sign example: using async-await](#sign-example-using-async-await)
+    - [Sign example: using promises](#sign-example-using-promises)
+    - [Sign example: success](#sign-example-success)
+    - [Sign example: failure](#sign-example-failure)
+- [CORS setup](#cors-setup)
+  - [CORS origin configuration](#cors-origin-configuration)
+  - [Authenticate example: using async-await with CORS](#authenticate-example-using-async-await-with-cors)
+  - [CORS credentials](#cors-credentials)
 - [Known errors](#known-errors)
     - [Error codes](#error-codes)
       - [Timeout errors](#timeout-errors)
@@ -158,8 +158,6 @@ See below for `options` description.
   - [Testing changes locally](#testing-changes-locally)
     - [Using `npm link`](#using-npm-link)
     - [Using `npm pack`](#using-npm-pack)
-
-<!-- /code_chunk_output -->
 
 
 ## Install
@@ -268,7 +266,7 @@ Version {
 }
 ```
 
-#### Status example - check using async-await
+#### Status example: using async-await
 
 ```js
 try {
@@ -283,7 +281,7 @@ try {
 }
 ```
 
-#### Status example - check using promises
+#### Status example: using promises
 
 ```js
 webeid.status()
@@ -291,7 +289,7 @@ webeid.status()
 .catch((error) => { /* HANDLE FAILURE */ });
 ```
 
-#### Status example - success
+#### Status example: success
 
 The result of a status check is the status object which contains SemVer strings for the library, browser extension and native application.
 
@@ -304,7 +302,7 @@ The result of a status check is the status object which contains SemVer strings 
 ```
 
 
-#### Status example - failure
+#### Status example: failure
 
 When the status check fails, in addition to the usual `name`, `message` and `stack` properties, the error object contains additional info **when possible**.  
 See [Known errors](#known-errors) for error `code` options.
@@ -356,6 +354,7 @@ Requests the Web-eID browser extension to authenticate the user.
 | `options`                        | `object` |          | **Required** authentication request options object    |
 | `options.getAuthChallengeUrl`    | `string` |          | **Required** authentication challenge GET request URL |
 | `options.postAuthTokenUrl`       | `string` |          | **Required** authentication token POST request URL    |
+| `options.getCorsConfigUrl`       | `string` |          | **Optional** CORS configuration GET request URL       |
 | `options.headers`                | `object` | `{ }`    | **Optional** HTTP request headers                     |
 | `options.userInteractionTimeout` | `number` | `120000` | **Optional** user interaction timeout in milliseconds |
 | `options.serverRequestTimeout`   | `number` | `20000`  | **Optional** server request timeout in milliseconds   |
@@ -378,6 +377,10 @@ for a different reason, the server should respond with an appropriate
 HTTP error status code and an optional JSON payload.
 
 When this request succeeds or fails, the response, including the optional payload, will be part of the resolution or failure of the Promise which the `authenticate(...)` method returns.
+
+**`AuthenticateOptions.getCorsConfigUrl`**
+This URL should respond to a GET request with a CORS configuration JSON object.  
+See [CORS setup](#cors-setup) for details.
 
 **`AuthenticateOptions.headers`**  
 This optional field may contain additional HTTP headers which the browser extension will use while making the **auth challenge** and **auth token** requests.  
@@ -421,7 +424,7 @@ interface HttpResponse {
 }
 ```
 
-#### Authenticate example - using async-await
+#### Authenticate example: using async-await
 
 ```js
 try {
@@ -441,7 +444,7 @@ try {
 }
 ```
 
-#### Authenticate example - using promises
+#### Authenticate example: using promises
 
 ```js
 const options = {
@@ -454,7 +457,7 @@ webeid.authenticate(options)
 .catch((error) => { /* HANDLE FAILURE */ });
 ```
 
-#### Authenticate example - success
+#### Authenticate example: success
 
 The result of a status check is the status object which contains SemVer strings for the library, browser extension and native application.
 
@@ -492,7 +495,7 @@ The result of a status check is the status object which contains SemVer strings 
 }
 ```
 
-#### Authenticate example - failure
+#### Authenticate example: failure
 
 When the authenticate request fails, in addition to the usual `name`, `message` and `stack` properties, the error object contains additional info **when possible**.  
 See [Known errors](#known-errors) for error `code` options.
@@ -553,6 +556,7 @@ Requests the Web-eID browser extension to sign a document hash.
 | `options`                        | `object` |          | **Required** sign request options object              |
 | `options.postPrepareSigningUrl`  | `string` |          | **Required** prepare signing POST request URL         |
 | `options.postFinalizeSigningUrl` | `string` |          | **Required** finalize signing POST request URL        |
+| `options.getCorsConfigUrl`       | `string` |          | **Optional** CORS configuration GET request URL       |
 | `options.headers`                | `object` | `{ }`    | **Optional** HTTP request headers                     |
 | `options.userInteractionTimeout` | `number` | `120000` | **Optional** user interaction timeout in milliseconds |
 | `options.serverRequestTimeout`   | `number` | `20000`  | **Optional** server request timeout in milliseconds   |
@@ -636,6 +640,10 @@ The request body will have a JSON payload with the `signature` field. In additio
 
 When this request succeeds or fails, the response, including the optional payload, will be part of the resolution or failure of the Promise which the `sign(...)` method returns.
 
+**`AuthenticateOptions.getCorsConfigUrl`**
+This URL should respond to a GET request with a CORS configuration JSON object.  
+See [CORS setup](#cors-setup) for details.
+
 **`SignOptions.headers`**  
 This optional field may contain additional HTTP headers which the browser extension will use while making the **prepare** and **finalize** requests.  
 For example, this option can be used to specify authorization headers.
@@ -678,7 +686,7 @@ interface HttpResponse {
 }
 ```
 
-#### Sign example - using async-await
+#### Sign example: using async-await
 
 ```js
 try {
@@ -698,7 +706,7 @@ try {
 }
 ```
 
-#### Sign example - using promises
+#### Sign example: using promises
 
 ```js
 const options = {
@@ -711,7 +719,7 @@ webeid.sign(options)
 .catch((error) => { /* HANDLE FAILURE */ });
 ```
 
-#### Sign example - success
+#### Sign example: success
 
 The result of a status check is the status object which contains SemVer strings for the library, browser extension and native application.
 
@@ -745,7 +753,7 @@ The result of a status check is the status object which contains SemVer strings 
 }
 ```
 
-#### Sign example - failure
+#### Sign example: failure
 
 When the signing request fails, in addition to the usual `name`, `message` and `stack` properties, the error object contains additional info **when possible**.  
 See [Known errors](#known-errors) for error `code` options.
@@ -790,6 +798,84 @@ See [Known errors](#known-errors) for error `code` options.
   "stack": ...
 }
 ```
+
+## CORS setup
+CORS URLs cannot be provided in the JavaScript API directly.
+
+The URLs provided in [authenticate parameters](#authenticate-parameters) and [sign parameters](#sign-parameters) must have the same origin as the website where the Web-eID library is used. In the case where the origin differs, the extension will reject the authentication or signing request. 
+
+For the following examples, it's assumed that...
+- https://example.com is the website's origin
+- https://api.example.com is the API server's origin
+
+### CORS origin configuration
+Serve a static CORS configuration JSON file on the website's origin.  
+For example `https://example.com/webeid-cors.json`
+```json
+{
+  "authUrlOrigin": "https://api.example.com",
+  "signUrlOrigin": "https://api.example.com"
+}
+```
+
+In case the Web-eID extension is only used for authentication or only for signing, you may omit the unused configuration entry.
+
+If needed, the `authUrlOrigin` and `signUrlOrigin` may differ.
+
+### Authenticate example: using async-await with CORS
+**Set the `getCorsConfigUrl` in [authenticate](#authenticate) options**
+```js
+try {
+  const options = {
+    getAuthChallengeUrl: "/auth-challenge",
+    postAuthTokenUrl:    "/auth-token",
+    getCorsConfigUrl:    "/webeid-cors.json",
+  };
+
+  const response = await webeid.authenticate(options);
+
+  // HANDLE SUCCESS
+
+} catch (error) {
+
+  // HANDLE FAILURE
+
+}
+```
+The following HTTP requests will be made:
+- `GET https://api.example.com/auth-challenge`
+- `POST https://api.example.com/auth-token`
+
+**Set the `getCorsConfigUrl` in [sign](#sign) options**
+```js
+try {
+  const options = {
+    postPrepareSigningUrl:  "/document/123/sign/prepare",
+    postFinalizeSigningUrl: "/document/123/sign/finalize",
+    getCorsConfigUrl:       "/webeid-cors.json",
+  };
+
+  const response = await webeid.sign(options);
+
+  // HANDLE SUCCESS
+
+} catch (error) {
+
+  // HANDLE FAILURE
+
+}
+```
+The following HTTP requests will be made:
+- `GET https://api.example.com/document/123/sign/prepare`
+- `POST https://api.example.com/document/123/sign/finalize`
+
+### CORS credentials
+The Web-eID extension will make CORS requests with [credentials: "include"](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials).
+
+To share credentials over CORS:
+- Configure [Access-Control-Allow-Credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials)
+- Configured session cookies to use [SameSite=None](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
+
 
 ## Known errors
 

@@ -39,6 +39,24 @@ export default interface SignOptions {
   postFinalizeSigningUrl: string;
 
   /**
+   * CORS configuration GET request URL
+   *
+   * This URL should respond to a GET request with a CORS configuration file.
+   * The request will be made by the browser extension.
+   *
+   * This URL must have the same origin as the website where Web-eID library is used.
+   * The returned URLs can have a different origin.
+   *
+   * @example
+   *   // Example response from the server
+   *   {
+   *     "authUrlOrigin": "https://auth.example.com",
+   *     "signUrlOrigin": "https://sign.example.com"
+   *   }
+   */
+  getCorsConfigUrl?: string;
+
+  /**
    * Headers to append to the requests.
    */
   headers?: {

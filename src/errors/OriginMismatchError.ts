@@ -25,7 +25,7 @@ import ErrorCode from "./ErrorCode";
 export default class OriginMismatchError extends Error {
   public code: ErrorCode;
 
-  constructor(message = "URLs for a single operation require the same origin") {
+  constructor(message: string) {
     super(message);
 
     this.name = this.constructor.name;

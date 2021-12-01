@@ -92,6 +92,34 @@ describe("authenticate", () => {
       "*",
     );
   });
+
+  it("should include CORS config URL with message to extension when provided", async () => {
+    jest.spyOn(window, "postMessage").mockImplementation();
+
+    const options: AuthenticateOptions = {
+      getAuthChallengeUrl:    "https://test/challenge",
+      postAuthTokenUrl:       "https://test/token",
+      getCorsConfigUrl:       "https://test/webeid-cors.json",
+      userInteractionTimeout: 1,
+      serverRequestTimeout:   1,
+    };
+
+    try { await webeid.authenticate(options); } catch (e) { /* ignore */ }
+
+    expect(window.postMessage).toBeCalledTimes(1);
+    expect(window.postMessage).toBeCalledWith(
+      {
+        action:                 "web-eid:authenticate",
+        getAuthChallengeUrl:    "https://test/challenge",
+        postAuthTokenUrl:       "https://test/token",
+        getCorsConfigUrl:       "https://test/webeid-cors.json",
+        userInteractionTimeout: 1,
+        serverRequestTimeout:   1,
+        libraryVersion:         process.env.npm_package_version,
+      },
+      "*",
+    );
+  });
 });
 
 
@@ -112,6 +140,34 @@ describe("sign", () => {
   });
 
   it("should include library version with message to extension", async () => {
+    jest.spyOn(window, "postMessage").mockImplementation();
+
+    const options: SignOptions = {
+      postPrepareSigningUrl:  "https://test/prepare",
+      postFinalizeSigningUrl: "https://test/finalize",
+      getCorsConfigUrl:       "https://test/webeid-cors.json",
+      userInteractionTimeout: 1,
+      serverRequestTimeout:   1,
+    };
+
+    try { await webeid.sign(options); } catch (e) { /* ignore */ }
+
+    expect(window.postMessage).toBeCalledTimes(1);
+    expect(window.postMessage).toBeCalledWith(
+      {
+        action:                 "web-eid:sign",
+        postPrepareSigningUrl:  "https://test/prepare",
+        postFinalizeSigningUrl: "https://test/finalize",
+        getCorsConfigUrl:       "https://test/webeid-cors.json",
+        userInteractionTimeout: 1,
+        serverRequestTimeout:   1,
+        libraryVersion:         process.env.npm_package_version,
+      },
+      "*",
+    );
+  });
+
+  it("should include CORS config URL with message to extension when provided", async () => {
     jest.spyOn(window, "postMessage").mockImplementation();
 
     const options: SignOptions = {
